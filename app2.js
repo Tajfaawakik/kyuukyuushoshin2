@@ -1,14 +1,11 @@
 // app2.js
-
 const App2 = {
     patient: null,
     elements: {},
     medicalData: [],
     keywordsForDetection: [],
     
-    // Using an async function for initialization
     async initialize() {
-        // Define elements
         this.elements = {
             symptomSelect: document.getElementById('symptom-select'),
             resultsContainer: document.getElementById('results-container'),
@@ -17,15 +14,13 @@ const App2 = {
             copyButton: document.getElementById('copy-button-app2')
         };
         
-        // Bind 'this' to all methods that need it, BEFORE any async operations
         this.load = this.load.bind(this);
-        this.updateAndSave = this.updateAndSave.bind(this);
-        this.handleSymptomSelectionChange = this.handleSymptomSelectionChange.bind(this);
         this.handleCardClick = this.handleCardClick.bind(this);
-        this.handleTagClick = this.handleTagClick.bind(this);
-        this.render = this.render.bind(this);
+        // ★★★ START: BUG FIX ★★★
+        this.handleKeyDown = this.handleKeyDown.bind(this); 
+        this.handleKeywordSelection = this.handleKeywordSelection.bind(this);
+        // ★★★ END: BUG FIX ★★★
 
-        // Fetch data
         try {
             const [medicalResponse, keywordsResponse] = await Promise.all([
                 fetch('medicalData.json'),
@@ -38,14 +33,16 @@ const App2 = {
             if (this.elements.resultsContainer) {
                 this.elements.resultsContainer.innerHTML = '<p style="color: red;">データ読み込みに失敗しました。</p>';
             }
-            return; // Stop initialization if data fails
+            return;
         }
         
-        // Populate UI and add listeners AFTER data is ready
         this.populateSymptomDropdown();
-        this.elements.symptomSelect.addEventListener('change', this.handleSymptomSelectionChange);
-        this.elements.selectedKeywordsContainer.addEventListener('click', this.handleTagClick);
+        this.elements.symptomSelect.addEventListener('change', () => this.updateAndSave(this.handleSymptomSelectionChange));
+        this.elements.selectedKeywordsContainer.addEventListener('click', (e) => this.updateAndSave(() => this.handleTagClick(e)));
         this.elements.resultsContainer.addEventListener('click', this.handleCardClick);
+        // ★★★ START: BUG FIX ★★★
+        this.elements.resultsContainer.addEventListener('keydown', this.handleKeyDown);
+        // ★★★ END: BUG FIX ★★★
         this.elements.copyButton.addEventListener('click', () => navigator.clipboard.writeText(this.elements.copyTextArea.value));
     },
 
@@ -54,14 +51,13 @@ const App2 = {
         this.render();
     },
 
-    updateAndSave() {
+    // 変更処理を引数で受け取り、保存と再描画を行うヘルパー関数
+    updateAndSave(changeFunction) {
         if (!this.patient) return;
+        if (changeFunction) changeFunction.call(this);
         PatientDataManager.savePatient(this.patient);
         this.render();
-        // Also notify App1 to update its view
-        if (window.App1) {
-            App1.load(this.patient);
-        }
+        if (window.App1) App1.load(this.patient);
     },
     
     populateSymptomDropdown() {
@@ -76,41 +72,52 @@ const App2 = {
     },
 
     handleSymptomSelectionChange() {
-        if (!this.patient) return;
         const selectedOptions = Array.from(this.elements.symptomSelect.selectedOptions).map(opt => opt.value);
         this.patient.data.symptoms = selectedOptions;
-        this.updateAndSave();
     },
 
+    // ★★★ START: BUG FIX ★★★
+    // キーワード選択のロジックを共通関数化
+    handleKeywordSelection(keywordElement) {
+        const keyword = keywordElement.dataset.keyword;
+        const keywords = new Set(this.patient.data.selectedKeywords || []);
+        if (keywords.has(keyword)) keywords.delete(keyword);
+        else keywords.add(keyword);
+        this.patient.data.selectedKeywords = [...keywords];
+    },
+
+    // キーボード操作用のハンドラを追加
+    handleKeyDown(event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            const keywordTarget = event.target.closest('.clickable-keyword');
+            if (keywordTarget) {
+                event.preventDefault(); // スペースキーでのスクロールなどを防ぐ
+                this.updateAndSave(() => this.handleKeywordSelection(keywordTarget));
+            }
+        }
+    },
+    // ★★★ END: BUG FIX ★★★
+
     handleCardClick(event) {
-        if (!this.patient) return;
         const keywordTarget = event.target.closest('.clickable-keyword');
         const checkboxTarget = event.target.closest('.diagnosis-checkbox');
 
         if (keywordTarget) {
-            const keyword = keywordTarget.dataset.keyword;
-            const keywords = new Set(this.patient.data.selectedKeywords || []);
-            if (keywords.has(keyword)) keywords.delete(keyword);
-            else keywords.add(keyword);
-            this.patient.data.selectedKeywords = [...keywords];
+            this.updateAndSave(() => this.handleKeywordSelection(keywordTarget));
+        } else if (checkboxTarget) {
+            this.updateAndSave(() => {
+                const diseaseName = checkboxTarget.dataset.diseaseName;
+                const symptomName = checkboxTarget.closest('.symptom-group').dataset.symptomName;
+                this.patient.data.recordedDiagnoses = this.patient.data.recordedDiagnoses || {};
+                const recordedSet = new Set(this.patient.data.recordedDiagnoses[symptomName] || []);
+                if (checkboxTarget.checked) recordedSet.add(diseaseName);
+                else recordedSet.delete(diseaseName);
+                this.patient.data.recordedDiagnoses[symptomName] = [...recordedSet];
+            });
         }
-        else if (checkboxTarget) {
-            const diseaseName = checkboxTarget.dataset.diseaseName;
-            const symptomName = checkboxTarget.closest('.symptom-group').dataset.symptomName;
-            
-            this.patient.data.recordedDiagnoses = this.patient.data.recordedDiagnoses || {};
-            const recordedSet = new Set(this.patient.data.recordedDiagnoses[symptomName] || []);
-
-            if (checkboxTarget.checked) recordedSet.add(diseaseName);
-            else recordedSet.delete(diseaseName);
-            
-            this.patient.data.recordedDiagnoses[symptomName] = [...recordedSet];
-        }
-        this.updateAndSave();
     },
 
     handleTagClick(event) {
-        if (!this.patient) return;
         const target = event.target.closest('.keyword-tag');
         if (target) {
             const keyword = target.dataset.keyword;
@@ -118,7 +125,6 @@ const App2 = {
             if (keyword && keywords.has(keyword)) {
                 keywords.delete(keyword);
                 this.patient.data.selectedKeywords = [...keywords];
-                this.updateAndSave();
             }
         }
     },
@@ -145,21 +151,17 @@ const App2 = {
             this.elements.resultsContainer.innerHTML = '<p>症候を選択すると、ここに関連する鑑別疾患が表示されます。</p>';
             return;
         }
-
         symptoms.forEach((symptomName, index) => {
             const symptomData = this.medicalData.find(d => d.symptom === symptomName);
             if (!symptomData) return;
-
             const groupDiv = document.createElement('div');
             groupDiv.className = 'symptom-group';
             groupDiv.dataset.symptomName = symptomName;
             if (index === 0) groupDiv.classList.add('primary');
-
             let titleHTML = `<h2>${symptomName} の鑑別疾患`;
             if (index === 0) titleHTML += `<span class="primary-badge">主訴</span>`;
             titleHTML += `</h2>`;
             groupDiv.innerHTML = titleHTML;
-            
             symptomData.differential_diagnoses.forEach(disease => {
                 groupDiv.appendChild(this.createDiseaseCard(disease, symptomName));
             });
@@ -171,7 +173,6 @@ const App2 = {
         const cardDiv = document.createElement('div');
         cardDiv.className = 'disease-card';
         const recordedDiagnoses = (this.patient.data.recordedDiagnoses || {})[symptomName] || [];
-
         cardDiv.innerHTML = `
             <div class="disease-card-header">
                 <input type="checkbox" class="diagnosis-checkbox" data-disease-name="${disease.name}" ${recordedDiagnoses.includes(disease.name) ? 'checked' : ''}>
@@ -193,7 +194,10 @@ const App2 = {
             const isHighlighted = selectedKeywords.has(keyword) ? 'highlighted' : '';
             try {
                 const regex = new RegExp(keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g');
-                highlightedText = highlightedText.replace(regex, match => `<span class="clickable-keyword ${isHighlighted}" data-keyword="${match}">${match}</span>`);
+                // ★★★ START: BUG FIX ★★★
+                // キーボード操作とアクセシビリティのため属性を追加
+                highlightedText = highlightedText.replace(regex, match => `<span class="clickable-keyword ${isHighlighted}" data-keyword="${match}" role="button" tabindex="0">${match}</span>`);
+                // ★★★ END: BUG FIX ★★★
             } catch(e) { /* ignore regex errors */ }
         });
         return highlightedText;
@@ -204,7 +208,6 @@ const App2 = {
         container.innerHTML = '<span>なし</span>';
         const keywords = this.patient.data.selectedKeywords || [];
         if (keywords.length === 0) return;
-        
         container.innerHTML = '';
         keywords.forEach(keyword => {
             const tag = document.createElement('span');
@@ -224,7 +227,6 @@ const App2 = {
         const keywords = p.selectedKeywords || [];
         
         if (symptoms.length > 0) text += `■ 症候\n主訴: ${symptoms[0]}\n${symptoms.length > 1 ? `その他: ${symptoms.slice(1).join(', ')}\n` : ''}\n`;
-
         if (Object.values(recordedDiagnoses).some(d => d.length > 0)) {
             text += '■ 鑑別疾患\n';
             Object.entries(recordedDiagnoses).forEach(([symptom, diseases]) => {

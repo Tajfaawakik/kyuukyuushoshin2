@@ -36,34 +36,34 @@
                         <label for="age">年齢:</label>
                         <input type="number" id="age" placeholder="75">
                         <label>性別:</label>
-                        <div id="gender" class="button-group">
-                            <button data-value="男性">男性</button>
+                        <div id="gender" class="button-group single-select">
+                        <button data-value="男性">男性</button>
                             <button data-value="女性">女性</button>
                             <button data-value="その他">その他</button>
                         </div>
                         <label for="chief-complaint">主訴:</label>
-                        <textarea id="chief-complaint" placeholder="患者の主な訴え"></textarea>
+                        <input type="text" id="chief-complaint" placeholder="患者の主な訴え">
                         <label for="history-of-present-illness">現病歴 (OPQRST):</label>
                         <textarea id="history-of-present-illness" placeholder="発症時期、誘因、症状の性質など"></textarea>
                     </fieldset>
                     <fieldset>
                         <legend>既往歴・アレルギー・生活歴など</legend>
                         <label>既往歴:</label>
-                        <div id="history-tags" class="button-group"></div>
+                        <div id="history-tags" class="button-group multi-select"></div>
                         <textarea id="surgery-history" placeholder="手術歴、その他の特記事項"></textarea>
                         <label>アレルギー:</label>
-                        <div id="allergy-tags" class="button-group">
-                             <button data-value="ペニシリン系">ペニシリン系</button>
+                        <div id="allergy-tags" class="button-group multi-select">
+                        <button data-value="ペニシリン系">ペニシリン系</button>
                              <button data-value="NSAIDs">NSAIDs</button>
                         </div>
                         <textarea id="other-allergies" placeholder="その他アレルギー情報"></textarea>
                         <label>内服薬:</label>
-                        <div id="med-suggestion-tags" class="button-group"></div>
+                        <div id="med-suggestion-tags" class="button-group multi-select"></div>
                         <div id="medication-list"></div>
                         <button id="add-med-row" class="add-button">＋ 薬剤を追加</button>
                         <label>生活歴:</label>
-                        <div id="lifestyle-tags" class="button-group">
-                            <button data-value="喫煙">喫煙</button>
+                        <div id="lifestyle-tags" class="button-group multi-select">
+                        <button data-value="喫煙">喫煙</button>
                             <button data-value="飲酒">飲酒</button>
                         </div>
                         <textarea id="lifestyle-details" placeholder="喫煙(Brinkman index)、飲酒量など詳細"></textarea>
