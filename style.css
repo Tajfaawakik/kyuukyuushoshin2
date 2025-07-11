@@ -1,0 +1,379 @@
+/* ==========================================================================
+   Global Styles & Variables
+   ========================================================================== */
+:root {
+    --primary-color: #005a9c;
+    --secondary-color: #f0f8ff;
+    --border-color: #ccc;
+    --bg-color: #f4f7f9;
+    --danger-color: #dc3545;
+    --highlight-bg: #ffd700;
+    --highlight-text: #000;
+    --highlight-abnormal: #fff3cd;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo;
+    line-height: 1.6;
+    color: #333;
+    background-color: var(--bg-color);
+    margin: 0;
+}
+
+main {
+    padding: 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--primary-color);
+}
+
+fieldset {
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    margin-bottom: 20px;
+    padding: 15px;
+}
+
+legend {
+    font-weight: bold;
+    color: var(--primary-color);
+    padding: 0 0.5em;
+}
+
+label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+textarea,
+select {
+    width: 95%;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+
+/* ==========================================================================
+   Header & Navigation
+   ========================================================================== */
+.app-header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.app-header h1 {
+    margin: 0 0 1rem 0;
+    color: white;
+}
+
+.header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.patient-management {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.patient-management select, .patient-management button {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
+nav#app-nav {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: #fff;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.nav-button:hover, .nav-button.active {
+    background-color: #004a8c;
+    color: #fff;
+    border-color: #004a8c;
+}
+
+.app-content {
+    display: none;
+    animation: fadeIn 0.5s;
+}
+
+.app-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ==========================================================================
+   App 1: カルテ記載支援
+   ========================================================================== */
+#app1 .container-app1 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+#app1 .input-panel, #app1 .output-panel {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#app1 .input-panel {
+    flex: 2;
+    min-width: 300px;
+}
+
+#app1 .output-panel {
+    flex: 1;
+    min-width: 300px;
+}
+
+#app1 .button-group button {
+    padding: 8px 12px;
+    margin: 5px 5px 5px 0;
+    border: 1px solid #007bff;
+    background-color: #fff;
+    color: #007bff;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+#app1 .button-group button.active {
+    background-color: #007bff;
+    color: #fff;
+}
+
+#app1 .med-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+#app1 .med-row input {
+    flex-grow: 1;
+}
+
+#app1 .details-area {
+    padding: 10px;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    margin-top: 5px;
+}
+
+#app1 .adl-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+#app1 .adl-item select {
+    width: 60%;
+}
+
+#app1 .score-display {
+    text-align: right;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 15px;
+    color: var(--danger-color);
+}
+
+#app1 #output-memo {
+    width: 95%;
+    height: 75vh;
+    white-space: pre-wrap;
+    background-color: #e9ecef;
+}
+
+#app1 #copy-button-app1, #app1 .add-button, #app1 .delete-button {
+    display: inline-block;
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    margin-top: 10px;
+    width: auto;
+}
+#app1 .delete-button {
+    background-color: var(--danger-color);
+    padding: 5px 10px;
+}
+
+/* ==========================================================================
+   App 2: 症候鑑別支援
+   ========================================================================== */
+#app2 .container-app2 {
+    padding: 1rem;
+}
+
+#app2 .controls, #app2 #selected-keywords-container, #app2 #record-copy-area {
+    margin-bottom: 1rem;
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#app2 #symptom-select {
+    width: 100%;
+    min-height: 100px;
+}
+
+#app2 #selected-keywords-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+#app2 .keyword-tag {
+    background-color: #e0e0e0;
+    color: #333;
+    padding: 0.3rem 0.7rem;
+    border-radius: 15px;
+    font-size: 0.9em;
+    cursor: pointer;
+}
+#app2 .keyword-tag .remove-tag::before { content: ' ×'; font-weight: bold; margin-left: 4px; }
+
+#app2 #results-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+#app2 .symptom-group {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    flex: 1 1 100%;
+}
+#app2 .symptom-group.primary { border: 2px solid var(--danger-color); }
+#app2 .primary-badge {
+    background-color: var(--danger-color);
+    color: white;
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 10px;
+    margin-left: 1rem;
+}
+
+#app2 .disease-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    position: relative;
+}
+#app2 .disease-card.pinned { border-color: #ff4500; border-width: 1.5px; }
+
+#app2 .disease-card-header { display: flex; align-items: center; gap: 0.5rem; }
+#app2 .disease-card h3 { margin: 0; flex-grow: 1; }
+#app2 .disease-card-header .pin-button { order: 2; }
+#app2 .diagnosis-checkbox { width: 1.2rem; height: 1.2rem; order: 0; }
+#app2 .pin-button { background: none; border: none; cursor: pointer; color: #ccc; }
+#app2 .pin-button.pinned { color: #ff4500; }
+
+#app2 .clickable-keyword { cursor: pointer; padding: 2px; border-radius: 3px; }
+#app2 .clickable-keyword.highlighted { background-color: var(--highlight-bg); color: var(--highlight-text); font-weight: bold; }
+
+#app2 #copy-textarea { width: 100%; height: 200px; }
+#app2 #copy-button-app2 {
+    display: block; margin-top: 1rem; padding: 0.7rem 1.5rem; border: none; background-color: var(--primary-color);
+    color: white; font-weight: bold; border-radius: 4px; cursor: pointer;
+}
+
+
+/* ==========================================================================
+   App 3: 採血結果入力
+   ========================================================================== */
+#app3 .container-app3 {
+    max-width: 900px; margin: 0 auto; background: #fff; padding: 20px 30px;
+    border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+#app3 .basic-info { display: flex; gap: 20px; }
+#app3 .form-group { margin-bottom: 15px; }
+
+#app3 input.abnormal { color: var(--danger-color); font-weight: bold; background-color: var(--highlight-abnormal); }
+#app3 .save-button {
+    display: inline-block; background-color: var(--primary-color); color: #fff; padding: 10px 20px;
+    border: none; border-radius: 4px; cursor: pointer; font-size: 1em;
+}
+
+#app3 .category-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; margin-bottom: 20px;
+}
+#app3 .item-group { display: flex; flex-direction: column; }
+#app3 .reference-value { font-size: 0.8em; color: #666; text-align: center; margin-top: 2px; }
+
+#app3 .accordion-header {
+    background-color: #f1f1f1; cursor: pointer; padding: 12px; width: 100%; border: none;
+    text-align: left; font-size: 1.1em; font-weight: bold; margin-top: 20px; border-radius: 4px;
+}
+#app3 .accordion-header::before { content: '▶ '; transition: transform 0.2s; }
+#app3 .accordion-header.active::before { transform: rotate(90deg); }
+
+#app3 .accordion-content { padding: 18px; max-height: 0; overflow: hidden; transition: max-height 0.2s ease-out; }
+
+#app3 #data-list h3 { font-size: 1.1em; }
+#app3 .data-record { border: 1px solid var(--border-color); border-radius: 5px; padding: 15px; margin-bottom: 15px; position: relative;}
+#app3 .data-record-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+#app3 .delete-button {
+    position: absolute; top: 10px; right: 10px; background: var(--danger-color); color: white; border: none;
+    border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-weight: bold; line-height: 24px; text-align: center;
+}
+
+/* ==========================================================================
+   Responsive Design
+   ========================================================================== */
+@media (max-width: 768px) {
+    .header-top-row { flex-direction: column; gap: 1rem; }
+    #app1 .container-app1, #app3 .basic-info { flex-direction: column; }
+    #app1 .input-panel, #app1 .output-panel { width: 100%; }
+}
